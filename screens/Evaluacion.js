@@ -14,6 +14,7 @@ import {
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import Share from "react-native-share";
 
 const Evaluacion = ({ onEvaluacionesCompletadas = () => {} }) => {
   const navigation = useNavigation();
@@ -26,6 +27,7 @@ const Evaluacion = ({ onEvaluacionesCompletadas = () => {} }) => {
   const [mostrarFelicitacion3, setMostrarFelicitacion3] = useState(false);
   const [cargando, setCargando] = useState(true);
   const [animacion, setAnimacion] = useState(false);
+  const [mostrarOpcionesFinales, setMostrarOpcionesFinales] = useState(false); // Nuevo estado
 
   const fetchEvaluaciones = async () => {
     try {
@@ -104,9 +106,30 @@ const Evaluacion = ({ onEvaluacionesCompletadas = () => {} }) => {
         setIndiceActual(indiceActual + 1);
       } else {
         onEvaluacionesCompletadas();
-        navigation.navigate("MenuPrincipal");
+        setMostrarOpcionesFinales(true); // Mostrar opciones al finalizar
       }
     }, 500);
+  };
+
+  const compartirResultados = async () => {
+    try {
+      const shareOptions = {
+        title: "Compartir resultados",
+        message: "¡He completado mis evaluaciones! 🎉",
+        url: "https://tuaplicacion.com",
+      };
+      await Share.open(shareOptions);
+    } catch (error) {
+      console.error("Error al compartir:", error);
+    } finally {
+      setMostrarOpcionesFinales(false); // Cerrar modal después de compartir
+      navigation.navigate("MenuPrincipal"); // Redirigir al menú principal
+    }
+  };
+
+  const salirAlMenuPrincipal = () => {
+    setMostrarOpcionesFinales(false); // Cerrar modal
+    navigation.navigate("MenuPrincipal"); // Redirigir al menú principal
   };
 
   if (cargando) {
@@ -146,6 +169,7 @@ const Evaluacion = ({ onEvaluacionesCompletadas = () => {} }) => {
         style={styles.logo}
       />
 
+      {/* Modal de felicitaciones */}
       <Modal
         visible={mostrarFelicitacion}
         transparent={true}
@@ -181,6 +205,34 @@ const Evaluacion = ({ onEvaluacionesCompletadas = () => {} }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>💪 ¡Tú puedes! 💪</Text>
             <Text style={styles.modalText}>La próxima vez lo lograrás.</Text>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de opciones finales */}
+      <Modal
+        visible={mostrarOpcionesFinales}
+        transparent={true}
+        animationType="fade"
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Evaluación completada</Text>
+            <Text style={styles.modalText}>
+              ¿Deseas compartir tus resultados en redes sociales?
+            </Text>
+            <TouchableOpacity
+              style={styles.compartirButton}
+              onPress={compartirResultados}
+            >
+              <Text style={styles.compartirButtonText}>Compartir</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.salirButton}
+              onPress={salirAlMenuPrincipal}
+            >
+              <Text style={styles.salirButtonText}>Salir</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -318,7 +370,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   opcionTextSeleccionada: {
-    color: "#fff", // Text color when selected
+    color: "#fff",
   },
   comentarioContainer: {
     width: "100%",
@@ -368,11 +420,37 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
-    color: "000",
+    color: "#000",
   },
   modalText: {
     fontSize: 16,
     color: "#000",
+    marginBottom: 20,
+  },
+  compartirButton: {
+    width: "100%",
+    backgroundColor: "#28a745",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  compartirButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  salirButton: {
+    width: "100%",
+    backgroundColor: "#dc3545",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  salirButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

@@ -26,11 +26,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="com.selvin270.frontend"/>
-        <data android:scheme="exp+frontend"/>
-        <data android:scheme="facebookLogin"/>
-        <data android:scheme="fb919735760371526"/>
         <data android:scheme="exp+bienstar"/>
-        <data android:scheme="fb1301508320994318"/>
       </intent-filter>
     </activity>
   </application>
